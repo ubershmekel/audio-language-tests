@@ -3,9 +3,11 @@
 <form>
 <input></input>
 <select></select>
-<button type="submit"></button>
+<button type="submit">button</button>
 </form>
 <script>
+  // speechSynthesis.speak(new SpeechSynthesisUtterance('What did you say'))
+  
 var synth = window.speechSynthesis;
 
 var inputForm = document.querySelector('form');
@@ -13,8 +15,6 @@ var inputTxt = document.querySelector('input');
 var voiceSelect = document.querySelector('select');
 
 var voices = synth.getVoices();
-
-  ...
 
 inputForm.onsubmit = function(event) {
   event.preventDefault();
