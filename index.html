@@ -1,12 +1,33 @@
 <html>
+
+<head>
+	<style>
+		button: {
+			margin: 1em;
+      display: inline-block;
+		}
+	</style>
+</head>
+
 <body>
-<form>
-<input></input>
+	<h1>Testing speech synth on the browser</h1>
+
+	<button onclick="simpleTest()">Simple Test</button>
+
+	<button onclick="init()">Re-init</button>
+
+	<form>
+		<input value="hello there"></input>
 <select></select>
-<button type="submit">button</button>
+<button type="submit">speak</button>
 </form>
 <script>
-  // speechSynthesis.speak(new SpeechSynthesisUtterance('What did you say'))
+  console.log('Initializing...');
+
+  function simpleTest() {
+    speechSynthesis.speak(new SpeechSynthesisUtterance('What did you say'));
+  }
+
   function speak(text) {
     var msg = new SpeechSynthesisUtterance();
     var voices = speechSynthesis.getVoices();
@@ -29,41 +50,66 @@
     }
   }
 
-  
-  
-var synth = window.speechSynthesis;
-
-var inputForm = document.querySelector('form');
-var inputTxt = document.querySelector('input');
-var voiceSelect = document.querySelector('select');
-
-var voices = synth.getVoices();
-for (voc in voices) {
-   console.log('voc', voc);
-   var opt = document.createElement("option");
-   opt.value= index;
-   opt.innerHTML = voc;
-
-   // then append it to the select element
-   voiceSelect.appendChild(opt);
-}
+function init() {
 
 
+  //var synth = window.speechSynthesis;
 
-inputForm.onsubmit = function(event) {
-  event.preventDefault();
+  var inputForm = document.querySelector('form');
+  var inputTxt = document.querySelector('input');
+  var voiceSelect = document.querySelector('select');
 
-  var utterThis = new SpeechSynthesisUtterance(inputTxt.value);
-  var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
-  for(i = 0; i < voices.length ; i++) {
-    if(voices[i].name === selectedOption) {
-      utterThis.voice = voices[i];
-    }
+  var voices = speechSynthesis.getVoices();
+  console.log('voices loop', voices.length);
+  if (voices.length === 0) {
+    alert('No synth voices :(');
+    return;
   }
-  utterThis.lang = 'en-US';
-  synth.speak(utterThis);
-  inputTxt.blur();
+
+  voices.sort((a, b) => ('' + a.lang).localeCompare(b.lang));
+
+  for (let i = 0; i < voices.length; i++) {
+    const voc = voices[i];
+    console.log('voc', voc);
+    var opt = document.createElement("option");
+    opt.value = i;
+    opt.innerHTML = voc.lang + ' - ' + voc.name;
+
+    // then append it to the select element
+    voiceSelect.appendChild(opt);
+  }
+
+
+
+  inputForm.onsubmit = function(event) {
+    event.preventDefault();
+
+    const text = inputTxt.value;
+    var utterThis = new SpeechSynthesisUtterance(text);
+    var selectedIndex = +voiceSelect.selectedOptions[0].value;
+    console.log("speeaking", text, selectedIndex, utterThis);
+    // for(i = 0; i < voices.length ; i++) {
+      // if(voices[i].name === selectedOption) {
+        // utterThis.voice = voices[i];
+      // }
+    // }
+    // utterThis.lang = 'en-US';
+    utterThis.voice = voices[selectedIndex];
+    speechSynthesis.speak(utterThis);
+    inputTxt.blur();
+  }
 }
+
+
+const start = new Date().getTime();
+window.speechSynthesis.onvoiceschanged = () => {
+  // https://stackoverflow.com/questions/49506716/speechsynthesis-getvoices-returns-empty-array-on-windows
+  const end = new Date().getTime();
+  const deltaMs = end - start;
+  console.warn(`voices are ready ${window.speechSynthesis.getVoices().length} after ${deltaMs} ms`);
+  init();
+}
+
 </script>
 </body>
 </html>
