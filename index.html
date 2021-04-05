@@ -1,106 +1,110 @@
 <html>
 
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<style>
-		button: {
-			margin: 1em;
-			display: block;
-		}
-	</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    button {
+      margin: 1em;
+      display: block;
+    }
+  </style>
 </head>
 
 <body>
-	<h1>Testing speech synth on the browser</h1>
-	<p>Test out different voices in your browser's text-to-speech engine. Type in text, choose a voice, and click "speak". If
-		there are no voices available, click "speak" once to initialize.</p>
-	<p>Sadly, this seems to be <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=487255">not working on Android</a></p>
-	<p>See <a href="https://github.com/ubershmekel/audio-language-tests">source on github</a> but you can just "view page source",
-		it's ~100 lines all in this html file.</p>
-	<form>
-		<input value="hello there"></input>
-      <select></select>
-      <button type="submit">speak</button>
-    </form>
-    
-    <button onclick="loop()">Loop</button>
+  <h1>Testing speech synth on the browser</h1>
+  <p>Test out different voices in your browser's text-to-speech engine. Type in text, choose a voice, and click "speak".
+    If
+    there are no voices available, click "speak" once to initialize.</p>
+  <p>Sadly, this seems to be <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=487255">not working on
+      Android</a></p>
+  <p>See <a href="https://github.com/ubershmekel/audio-language-tests">source on github</a> but you can just "view page
+    source",
+    it's ~100 lines all in this html file.</p>
+  <form>
+    <input value="hello there"></input>
+    <select></select>
+    <button type="submit">speak</button>
+  </form>
 
-    <script>
-      console.log('Initializing...');
-      
-      function speakTextInput() {
-        speechSynthesis.cancel();
-      
-        const text = inputTxt.value;
-        var utterThis = new SpeechSynthesisUtterance(text);
-        window.utter = utterThis;
-        var selectedIndex = +voiceSelect.selectedOptions[0].value;
-        console.log("speeaking", text, selectedIndex, utterThis);
-      
-        utterThis.voice = voices[selectedIndex];
-        speechSynthesis.speak(utterThis);
-        utterThis.onend = (event) => {
-          console.log('Utterance has finished being spoken after ' + event.elapsedTime + ' milliseconds.');
-        }
-      
-        utterThis.onerror = (event) => {
-          alert('Utter error');
-          console.log('utter error', event);
-        }
+  <button onclick="loop()">Loop</button>
+
+  <script>
+    console.log('Initializing...');
+
+    function speakTextInput() {
+      speechSynthesis.cancel();
+
+      const text = inputTxt.value;
+      var utterThis = new SpeechSynthesisUtterance(text);
+      window.utter = utterThis;
+      var selectedIndex = +voiceSelect.selectedOptions[0].value;
+      console.log("speeaking", text, selectedIndex, utterThis);
+
+      utterThis.voice = voices[selectedIndex];
+      speechSynthesis.speak(utterThis);
+      utterThis.onend = (event) => {
+        console.log('Utterance has finished being spoken after ' + event.elapsedTime + ' milliseconds.');
       }
-      
-      var inputForm = document.querySelector('form');
-      var inputTxt = document.querySelector('input');
-      var voiceSelect = document.querySelector('select');
-      var voices = speechSynthesis.getVoices();
-      var didInit = false;
-      
-      inputForm.onsubmit = function(event) {
+
+      utterThis.onerror = (event) => {
+        alert('Utter error');
+        console.log('utter error', event);
+      }
+    }
+
+    var inputForm = document.querySelector('form');
+    var inputTxt = document.querySelector('input');
+    var voiceSelect = document.querySelector('select');
+    var voices = speechSynthesis.getVoices();
+    var didInit = false;
+
+    inputForm.onsubmit = function (event) {
       event.preventDefault();
       if (!didInit) {
         didInit = true;
         init();
       }
       speakTextInput();
-      }
-      
-      function init() {
+    }
+
+    function init() {
       voices = speechSynthesis.getVoices();
       console.log('voices loop', voices.length);
       if (voices.length === 0) {
         alert('No synth voices :(');
         return;
       }
-      
+
       voices.sort((a, b) => ('' + a.lang).localeCompare(b.lang));
-      
+
       for (let i = 0; i < voices.length; i++) {
         const voc = voices[i];
         console.log('voc', voc);
         var opt = document.createElement("option");
         opt.value = i;
         opt.innerHTML = voc.lang + ' - ' + voc.name;
-      
+
         // then append it to the select element
         voiceSelect.appendChild(opt);
       }
-      }
-      
-      
-      const start = new Date().getTime();
-      window.speechSynthesis.onvoiceschanged = () => {
+    }
+
+
+    const start = new Date().getTime();
+    window.speechSynthesis.onvoiceschanged = () => {
       // https://stackoverflow.com/questions/49506716/speechsynthesis-getvoices-returns-empty-array-on-windows
       const end = new Date().getTime();
       const deltaMs = end - start;
       console.log(`voices are ready ${window.speechSynthesis.getVoices().length} after ${deltaMs} ms`);
       init();
-      }
-      
-      function loop() {
+    }
+
+    function loop() {
       speakTextInput();
       setTimeout(loop, 2000);
-      }
-      
-    </script>
-  </body>
+    }
+
+  </script>
+</body>
+
 </html>
