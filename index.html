@@ -1,10 +1,11 @@
 <html>
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		button: {
 			margin: 1em;
-      display: inline-block;
+      display: block;
 		}
 	</style>
 </head>
@@ -12,9 +13,7 @@
 <body>
 	<h1>Testing speech synth on the browser</h1>
 
-	<button onclick="simpleTest()">Simple Test</button>
-
-	<button onclick="init()">Re-init</button>
+	<button onclick="loop()">Loop</button>
 
 	<form>
 		<input value="hello there"></input>
@@ -24,42 +23,44 @@
 <script>
   console.log('Initializing...');
 
-  function simpleTest() {
-    speechSynthesis.speak(new SpeechSynthesisUtterance('What did you say'));
-  }
+  function speakTextInput() {
+    speechSynthesis.cancel();
 
-  function speak(text) {
-    var msg = new SpeechSynthesisUtterance();
-    var voices = speechSynthesis.getVoices();
-    msg.voice = voices[0];
-    msg.voiceURI = 'native';
-    msg.volume = 1; // 0 to 1
-    msg.rate = 1; // 0.1 to 10
-    msg.pitch = 2; //0 to 2
-    msg.text = text;
-    msg.lang = 'pl-PL';
+    const text = inputTxt.value;
+    var utterThis = new SpeechSynthesisUtterance(text);
+    window.utter = utterThis;
+    var selectedIndex = +voiceSelect.selectedOptions[0].value;
+    console.log("speeaking", text, selectedIndex, utterThis);
 
-    msg.onend = function(e) {
-      console.log('Finished in ' + event.elapsedTime + ' seconds.');
-    };
+    utterThis.voice = voices[selectedIndex];
+    speechSynthesis.speak(utterThis);
+    utterThis.onend = (event) => {
+      console.log('Utterance has finished being spoken after ' + event.elapsedTime + ' milliseconds.');
+    }
 
-    if('speechSynthesis' in window && msg.lang == 'pl-PL') {
-        speechSynthesis.speak(msg);
-    } else {
-        window.open('./info-about-browser.html', 'Info about your browser', 'height=350, width=600, top=200, left=200', 'scrollbars=no', 'resizable=no');
+    utterThis.onerror = (event) => {
+      alert('Utter error');
+      console.log('utter error', event);
     }
   }
 
+var inputForm = document.querySelector('form');
+var inputTxt = document.querySelector('input');
+var voiceSelect = document.querySelector('select');
+var voices = speechSynthesis.getVoices();
+var didInit = false;
+
+inputForm.onsubmit = function(event) {
+  event.preventDefault();
+  if (!didInit) {
+    didInit = true;
+    init();
+  }
+  speakTextInput();
+}
+
 function init() {
-
-
-  //var synth = window.speechSynthesis;
-
-  var inputForm = document.querySelector('form');
-  var inputTxt = document.querySelector('input');
-  var voiceSelect = document.querySelector('select');
-
-  var voices = speechSynthesis.getVoices();
+  voices = speechSynthesis.getVoices();
   console.log('voices loop', voices.length);
   if (voices.length === 0) {
     alert('No synth voices :(');
@@ -78,26 +79,6 @@ function init() {
     // then append it to the select element
     voiceSelect.appendChild(opt);
   }
-
-
-
-  inputForm.onsubmit = function(event) {
-    event.preventDefault();
-
-    const text = inputTxt.value;
-    var utterThis = new SpeechSynthesisUtterance(text);
-    var selectedIndex = +voiceSelect.selectedOptions[0].value;
-    console.log("speeaking", text, selectedIndex, utterThis);
-    // for(i = 0; i < voices.length ; i++) {
-      // if(voices[i].name === selectedOption) {
-        // utterThis.voice = voices[i];
-      // }
-    // }
-    // utterThis.lang = 'en-US';
-    utterThis.voice = voices[selectedIndex];
-    speechSynthesis.speak(utterThis);
-    inputTxt.blur();
-  }
 }
 
 
@@ -106,8 +87,13 @@ window.speechSynthesis.onvoiceschanged = () => {
   // https://stackoverflow.com/questions/49506716/speechsynthesis-getvoices-returns-empty-array-on-windows
   const end = new Date().getTime();
   const deltaMs = end - start;
-  console.warn(`voices are ready ${window.speechSynthesis.getVoices().length} after ${deltaMs} ms`);
+  console.log(`voices are ready ${window.speechSynthesis.getVoices().length} after ${deltaMs} ms`);
   init();
+}
+
+function loop() {
+  speakTextInput();
+  setTimeout(loop, 2000);
 }
 
 </script>

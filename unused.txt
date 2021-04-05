@@ -1,0 +1,55 @@
+	<button onclick="init()">Re-init</button>
+
+	<button onclick="simpleTest()">Simple Test</button>
+
+  function simpleTest() {
+    speechSynthesis.speak(new SpeechSynthesisUtterance('What did you say'));
+  }
+
+  // function speak(text) {
+  //   var msg = new SpeechSynthesisUtterance();
+  //   var voices = speechSynthesis.getVoices();
+  //   msg.voice = voices[0];
+  //   msg.voiceURI = 'native';
+  //   msg.volume = 1; // 0 to 1
+  //   msg.rate = 1; // 0.1 to 10
+  //   msg.pitch = 2; //0 to 2
+  //   msg.text = text;
+  //   msg.lang = 'pl-PL';
+
+  //   msg.onend = function(event) {
+  //     console.log('Finished in ' + event.elapsedTime + ' seconds.');
+  //   };
+
+  //   if('speechSynthesis' in window && msg.lang == 'pl-PL') {
+  //       speechSynthesis.speak(msg);
+  //   } else {
+  //       window.open('./info-about-browser.html', 'Info about your browser', 'height=350, width=600, top=200, left=200', 'scrollbars=no', 'resizable=no');
+  //   }
+  // }
+
+
+
+      // for(i = 0; i < voices.length ; i++) {
+      // if(voices[i].name === selectedOption) {
+        // utterThis.voice = voices[i];
+      // }
+    // }
+    // utterThis.lang = 'en-US';
+
+
+
+        // inputTxt.blur();
+    // speechSynthesis.cancel();
+
+
+
+
+    // window.utter = utterThis;
+    // utterThis.addEventListener('start', function () {
+    //   console.log('started');
+    // });
+
+    // utterThis.addEventListener('end', function () {
+    //   console.log('stopped');
+    // });
