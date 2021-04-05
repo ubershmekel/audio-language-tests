@@ -1,11 +1,11 @@
 <html>
 
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		button: {
 			margin: 1em;
-      display: block;
+			display: block;
 		}
 	</style>
 </head>
@@ -13,13 +13,18 @@
 <body>
 	<h1>Testing speech synth on the browser</h1>
 
-	<button onclick="loop()">Loop</button>
+  <p>Test out different voices in your browser's text-to-speech engine. Type in text, choose a voice, and click "speak". If there are no voices available, click "speak" once to initialize..</p>
+	<p>Sadly, this seems to be <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=487255">not working on Android</a></p>
+
 
 	<form>
 		<input value="hello there"></input>
-<select></select>
-<button type="submit">speak</button>
-</form>
+    <select></select>
+    <button type="submit">speak</button>
+  </form>
+
+	<button onclick="loop()">Loop</button>
+
 <script>
   console.log('Initializing...');
 
