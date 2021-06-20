@@ -13,10 +13,7 @@
 <body>
   <h1>Testing speech synth on the browser</h1>
   <p>Test out different voices in your browser's text-to-speech engine. Type in text, choose a voice, and click "speak".
-    If
-    there are no voices available, click "speak" once to initialize.</p>
-  <p>Sadly, this seems to be <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=487255">not working on
-      Android</a></p>
+    If there are no voices available, click "speak" once to initialize.</p>
   <p>See <a href="https://github.com/ubershmekel/audio-language-tests">source on github</a> but you can just "view page
     source",
     it's ~100 lines all in this html file.</p>
@@ -40,7 +37,13 @@
       var selectedIndex = +voiceSelect.selectedOptions[0].value;
       console.log("speeaking", text, selectedIndex, utterThis);
 
-      utterThis.voice = voices[selectedIndex];
+      const voc = voices[selectedIndex];
+      // https://stackoverflow.com/questions/33889107/speech-synthesis-in-chrome-for-android-not-loading-voices
+      // `utterThis.voice` works on iOS, MacOS, Windows Chrome, but not Android Chrome
+      utterThis.voice = voc; // for iOS
+      utterThis.lang = voc.lang; // for Android Chrome
+      utterThis.voiceURI = voc.voiceURI; // Not sure if needed
+
       speechSynthesis.speak(utterThis);
       utterThis.onend = (event) => {
         console.log('Utterance has finished being spoken after ' + event.elapsedTime + ' milliseconds.');
